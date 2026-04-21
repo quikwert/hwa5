@@ -53,8 +53,12 @@ public class Tnode {
 				Tnode youngerSibling = null;
 
 				for (int i = arity - 1; i >= 0 ; i--){
-					Tnode child = stack.pop();		
-
+					Tnode child;		
+					try{
+						child = stack.pop();
+					}catch(RuntimeException e){
+						throw new RuntimeException("Not enough operands for operation " + token);
+					}
 					if(i == 0) first = child;
 					child.nextSibling = youngerSibling;
 
