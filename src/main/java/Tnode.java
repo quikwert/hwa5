@@ -114,11 +114,14 @@ class Operation{
 }
 
 class Ops {
-	static final Map<String,Operation> OPS = Map.of(
-			"+", new Operation(2, (node, a) -> a[0] + a[1]),
-			"-", new Operation(2, (node, a) -> a[0] - a[1]),
-			"*", new Operation(2, (node, a) -> a[0] * a[1]),
-			"/", new Operation(2, (node, a) -> a[0] / a[1])
-			);
+	static final Map<String,Operation> OPS = new HashMap<>();
+	static{
+
+		OPS.put("+", new Operation(2, (node, a) -> a[0] + a[1]));
+		OPS.put("-", new Operation(2, (node, a) -> a[0] - a[1]));
+		OPS.put("*", new Operation(2, (node, a) -> a[0] * a[1]));
+		OPS.put("/", new Operation(2, (node, a) -> a[0] / a[1]));
+	}
+			
 }
 
