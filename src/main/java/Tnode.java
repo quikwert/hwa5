@@ -15,34 +15,34 @@ public class Tnode {
 	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        print(this, "", true, sb);
+        print(this, sb, true);
         return sb.toString();
     }
 
-    private static void print(Tnode node, String prefix, boolean isLast, StringBuilder sb) {
-        if (node == null) return;
+    private static void print(Tnode node, StringBuilder sb, boolean isRoot) {
+		sb.append(node.name);
+	if(Operation.isOperation(node.name)){
+		sb.append("(");
+	}
+	if(node.firstChild != null){
+		print(node.firstChild, sb, false);
+	}	
+	if(node.nextSibling == null ){
+		if(!isRoot)sb.append(")");
+		return;
+	}
+	sb.append(", ");
+	print(node.nextSibling, sb,false);
+	return;
+	
 
-        sb.append(prefix);
-        sb.append(isLast ? "└── " : "├── ");
-        sb.append(node.name).append("\n");
-
-        // children use extended prefix
-        String childPrefix = prefix + (isLast ? "    " : "│   ");
-
-        Tnode child = node.firstChild;
-        while (child != null) {
-            boolean last = (child.nextSibling == null);
-            print(child, childPrefix, last, sb);
-            child = child.nextSibling;
-        }
     }
 
 	public static Tnode buildFromRPN (String pol) {
 		Stack<Tnode> stack = new Stack<>();
 		String[] tokens = pol.split("\\s+");
+		if(tokens.length == 0) throw new RuntimeException("Cannot build from empty String!");
 		for (String token : tokens){
-					System.out.println(token);
-
 			if(Operation.isOperation(token)){
 
 				Operation op = Operation.get(token);
@@ -50,15 +50,15 @@ public class Tnode {
 
 				Tnode node = new Tnode(token);
 				Tnode first = null;
-				Tnode prev = null;
+				Tnode youngerSibling = null;
 
-				for (int i = 0; i < arity; i++){
+				for (int i = arity - 1; i >= 0 ; i--){
 					Tnode child = stack.pop();		
 
 					if(i == 0) first = child;
-					else prev.nextSibling = child;
+					child.nextSibling = youngerSibling;
 
-					prev = child;
+					youngerSibling = child;
 				}
 
 				node.firstChild = first;
@@ -73,8 +73,11 @@ public class Tnode {
 				}
 			}
 		}
-
-		return stack.pop();
+		Tnode ret = stack.pop();
+		if(!stack.empty()){
+			throw new RuntimeException("Too many numbers in expression: " + pol);
+		}
+		return ret;
 	}
 
 	public static void main (String[] param) {
